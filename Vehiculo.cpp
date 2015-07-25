@@ -27,7 +27,7 @@ class Vehiculo{
             void set_camino(ColaVertices*);                         //setea la lista de vertices a seguir para completar el recorrido
             void put_recorrido(int p) {recorrido->agregar(p);};     //agrega una esquina al recorrido ya hecho por el vehiculo
             int get_siguiente(void) {return camino->cabeza();};     //devuelve la siguiente posicion a la que se debe dirigir el vehiculo
-            void borrar_siguiente(void) {camino->eliminar();};      //borra de la cola la siguiente posicion a seguir por el vehiculo
+            void borrar_cabeza(void) {camino->eliminar();};      	//borra del camino el frente de la cola, dejando el 2do elemento como posicion a seguir por el vehiculo
             
             void rutaRandom();										//Setea aleatoriamente Origen y Destino (dentro del rango adecuado). Tambien Posicion_actual
             string get_tipo(void) {return tipo;};                   //

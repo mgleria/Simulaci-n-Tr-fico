@@ -185,7 +185,8 @@ void Listasemaforos::print_TODO()
     while(nodo != NULL)
     {	
 		cont++;
-		cout<<setw(100) << setiosflags(ios::right) <<"Semaforo numero: "<<cont;
+		cout<<setw(100) << setiosflags(ios::right) <<"Semaforo numero: "<<cont<<".   ";
+		nodo->get_dato()->print();
         nodo->get_dato()->print_AUTOS();
         nodo = nodo->get_next();
     }

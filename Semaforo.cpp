@@ -8,6 +8,7 @@ class Semaforo{
 			int ubicacion;
 			int procedencia;
 			int carriles;
+			bool bloqueado;
 			HeapMin *colaVehiculos;
 
 	public:
@@ -16,11 +17,15 @@ class Semaforo{
 			int get_ubicacion(){return ubicacion;};
 			int get_procedencia(){return procedencia;};
 			int get_carriles(){return carriles;};
+			bool get_estado() {return bloqueado;};
+			void bloquear() {bloqueado = true;};
+			void desbloquear() {bloqueado = false;};
 			bool is_full(){ return colaVehiculos->heap_lleno(); };
 			
 			HeapMin *get_ColaDelSemaforo(){ return colaVehiculos;};
 			
 			int congestion();
+			int get_cantidadDeVehiculos();
 			void print();
 			void print_AUTOS();
 			
@@ -36,6 +41,7 @@ Semaforo::Semaforo(int c, int IDnodo, int proc){
 		ubicacion=IDnodo;
 		procedencia=proc;
 		carriles=c;
+		bloqueado = false;
 		
 		int capacidad_cola = 3*N*c;
 		colaVehiculos=new HeapMin(capacidad_cola);
@@ -52,15 +58,21 @@ bool Semaforo::rojo(Vehiculo *v)
 int Semaforo::congestion(){
 	return (int)(colaVehiculos->get_cantVehiculos()*100/colaVehiculos->get_capacidad());
 }
+int Semaforo::get_cantidadDeVehiculos(){
+	if(!colaVehiculos->heap_vacio()) return colaVehiculos->get_cantVehiculos();
+	else return 0;
+}
+
 //Imprime la información concerniente al semáforo.
 void Semaforo::print(){
 	
 	if(this != NULL){
 		cout<<endl;
-		cout<<"Ubicado en Nodo Nro. :"<<setw(3)<<ubicacion+1; //Le sumo 1 porque la numeración de los nodos arranca en 1???
-		cout<<" Procedencia :"<<setw(3)<<procedencia+1;
+		cout<<"Ubicado en Nodo Nro. :"<<setw(3)<<ubicacion; 
+		cout<<" Procedencia :"<<setw(3)<<procedencia;
 		cout<<" Nro Carriles: "<<carriles;
-		cout<<" Congestion del Semaforo : "<<setw(3)<<congestion()<<"%"
+		cout<<" Congestion del Semaforo: "<<setw(3)<<congestion()<<"% ";
+		cout<<"Cant. Vehiculos: "<<setw(3)<<get_cantidadDeVehiculos()
 		<<endl;
 	}
 	else cout<<endl<<"El semaforo NO es valido"<<endl;
