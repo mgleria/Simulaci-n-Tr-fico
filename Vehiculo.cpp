@@ -55,7 +55,7 @@ Vehiculo::Vehiculo(string t, int mat, int o, int d)
 		}
 		else{
 			rutaRandom();
-			cout<<"Origen y/o Destino incorrecto/s. "<<"Para el vehiculo Mat. Nro. :"<<matricula<<", se seteo el siguiente Origen-Destino:"<<endl;
+			cout<<"Origen y/o Destino incorrecto/s. Para el vehiculo Mat. Nro. :"<<matricula<<", se seteo el siguiente Origen-Destino:"<<endl;
 			cout<<"Origen: "<<origen<<"  Destino: "<<destino<<endl;
 		}
 	    recorrido = new ColaVertices();

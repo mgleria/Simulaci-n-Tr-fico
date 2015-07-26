@@ -1,18 +1,16 @@
 #include <iostream>
 #include <math.h> 
-//#include <string>
 #include <iomanip>
-//#include <time.h>     VERIFICAR SI LOS UTILIZO
-//#include <sstream>
+#include <time.h>     
 #include <stdio.h>
 #include <stdlib.h> 
 #include <fstream>
 
 using namespace std;
 
-#define N 5							//cantidad de trafico que atraviesa un semaforo en un turno.
-#define cantNODOS 16					//Cantidad de esquinas que tiene el plano de la ciudad
-#define cantSemaforos 36    			//AJUSTAR valor 
+#define N 5							//Cantidad de trafico que atraviesa un semaforo en un turno.
+#define cantNODOS 16				//Cantidad de esquinas que tiene el plano de la ciudad
+#define cantSemaforos 36    		//Cantidad de semáforos que tiene en total la ciudad 
 
 #include "Nodo.cpp"
 #include "ColaVertices.cpp"
@@ -23,9 +21,7 @@ using namespace std;
 void generarTrafico(Grafo *city, int nAutos, int nPatrulleros, int nAmbulancias,Listasemaforos* S);
 void verde(Semaforo *,Listasemaforos *);	//Metodo que permite el paso de vehiculos en la cantidad n por carril y envía, de ser posible,
 											//los autos al siguiente semaforo destino. 
-
-
- 
+void recalculando(Grafo *, Vehiculo *);
 
 int main(void){
 	Grafo *ciudad=new Grafo();
@@ -34,33 +30,12 @@ int main(void){
 	
 	ciudad->launch(Semaforos);
 	
-	//~ ciudad->print();
-	
 	generarTrafico(ciudad,70,20,10,Semaforos);
 
-	//~ Semaforos->print();
-	
-	//~ Vehiculo *v1=new Vehiculo();
-	//~ Vehiculo *v2=new Vehiculo();
-	Vehiculo *v3=new Vehiculo();
-	Vehiculo *miAuto = new Vehiculo("Auto",9999,0,15);      //Creo el vehiculo que pretendo conducir
-	//Vehiculo *miAuto=new Vehiculo();
-	
-	//~ v1->print_DatosVehiculo();
-	//~ v2->print_DatosVehiculo();
-	//~ v3->print_DatosVehiculo();
-	//~ miAuto->print_DatosVehiculo();
-	
-	//~ Semaforos->ubicarAleatorio(v1);
-	//~ Semaforos->ubicarAleatorio(v2);
-	Semaforos->ubicarAleatorio(v3);
-	Semaforos->ubicarAleatorio(miAuto); 
-	//~ cout<<endl<<"Semaforos->buscar(1,0)->rojo(miAuto); :"<<Semaforos->buscar(1,0)->rojo(miAuto)<<endl;
-	
-	//Calculo el camino a recorrer de cada uno
-	//~ v1->set_camino(ciudad->dijkstra(v1->get_origen(),v1->get_destino()));
-	//~ v2->set_camino(ciudad->dijkstra(v2->get_origen(),v2->get_destino()));
-	v3->set_camino(ciudad->dijkstra(v3->get_origen(),v3->get_destino()));
+	Vehiculo *miAuto = new Vehiculo("Auto",9999,15,0);      //Creo el vehiculo que pretendo conducir
+
+	Semaforos->ubicarMiAuto(miAuto);
+
 	miAuto->set_camino(ciudad->dijkstra(miAuto->get_origen(),miAuto->get_destino()));
 	
 	Semaforos->ordenar();
@@ -68,23 +43,31 @@ int main(void){
 	
 	Nodosemaforo *nodo;
 	Semaforo *semAux;
-	int i=0;		
+	int iteracion=0;		
 
 	while(miAuto->get_posicionActual()!=miAuto->get_destino())
 	{
 		nodo = Semaforos->get_czo();
-		i++;
+		iteracion++;
 		while(nodo!=NULL){
 			semAux = nodo->get_dato();
 			verde(semAux,Semaforos);
 			nodo = nodo->get_next();
 		}
 		Semaforos->ordenar();
-		cout<<endl<<"-----------------------ITERACION: "<<i<<"-------------------------------------------"<<endl;
+		
+		if((iteracion%2)==0&&(miAuto->get_posicionActual()!= miAuto->get_destino())){	//Recalculo el recorrido de mi auto cada 2 iteraciones
+			cout<<"Recalculando..."<<endl;
+			ciudad->actualizarMA(Semaforos);
+			cout<<"Pos_actual: "<<miAuto->get_posicionActual();
+			//~ recalculando(ciudad,miAuto);
+		}
+		
+		cout<<endl<<"-----------------------ITERACION: "<<iteracion<<"-------------------------------------------"<<endl;
 		miAuto->print_DatosVehiculo3();
 	}
 	
-	//Semaforos->print_TODO(miAuto);
+	//~ Semaforos->print_TODO(miAuto);
 
 	return 0;
 }
@@ -110,14 +93,14 @@ void generarTrafico(Grafo *city, int nAutos, int nPatrulleros, int nAmbulancias,
 		S->ubicarAleatorio(am);
 		am->set_camino(city->dijkstra(am->get_origen(),am->get_destino()));
 	}
-	
 	S->ordenar();
+	city->actualizarMA(S);
 	
 	///Verificar que la cantidad de vehiculos en el heap sea igual a la cantidad de vehiculos ingresados
 }
 
 
-//Despacha n vehículos hacia sus respectivos destinos si las colas en destino no están llenas. 
+//Despacha N vehículos hacia sus respectivos destinos si las colas en destino no están llenas. 
 //Si así lo fuere los autos permanecen en su actual ubicación. 
 void verde(Semaforo *semActual,Listasemaforos *S)
 {	
@@ -178,13 +161,11 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 		}
 		else semActual->bloquear(); //El vehiculo no existe, seguramente la cola del semaforo esta vacía. 
 	}
-	
-	//~ cout<<"Estado del semaforo al salir del ciclo: ";
-	//~ if(semActual->get_estado() == true) cout<<"Bloqueado"<<endl;
-	//~ else cout<<"Desbloqueado"<<endl;
-	//~ cout<<"Cantidad de vehiculos que pasaron el semaforo: "<<contVehiculos<<endl;
-	//~ cout<<"El último vehiculo que pasó: "<<endl;
-	//~ aux->print_DatosVehiculo3();
+}
+
+void recalculando(Grafo *city, Vehiculo *myCar)
+{
+	myCar->set_camino(city->dijkstra(myCar->get_posicionActual(),myCar->get_destino()));
 }
 
 

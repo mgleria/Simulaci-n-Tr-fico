@@ -42,6 +42,7 @@ class Listasemaforos{
             
             int get_congestion(int i);    						   //Devuelve la congestion del semaforo i de la lista. Si este no existe, devuelve -1.
 			void ubicarAleatorio(Vehiculo*); 
+			void ubicarMiAuto(Vehiculo *v);
 };
 
 Listasemaforos::~Listasemaforos(void)
@@ -75,6 +76,8 @@ Semaforo* Listasemaforos::cabeza(void)
 {
     return czo->get_dato();
 }
+
+
 
 Semaforo* Listasemaforos::buscar(int u, int a)
 {
@@ -151,7 +154,7 @@ void Listasemaforos::ubicarAleatorio(Vehiculo *v)
 	Semaforo *aux;
 	aux=busca_SemaforoNumero1(rnd);
 	
-	while(aux->get_ubicacion() == v->get_origen()){
+	while(aux->get_ubicacion() == v->get_destino()){ //
 		rnd= rand()%cantSemaforos;
 		aux=busca_SemaforoNumero1(rnd);
 	}
@@ -164,6 +167,26 @@ void Listasemaforos::ubicarAleatorio(Vehiculo *v)
 		else cout<<"El semaforo estaba colmado. No se pudo insertar el vehiculo mat.: "<<v->get_matricula()<<endl;			
 	}
 	else cout<<"Error en la busqueda del semaforo (UbicarAleatorio) "<<endl;
+}
+
+void Listasemaforos::ubicarMiAuto(Vehiculo *v)
+{ 	
+	Nodosemaforo *nodo = czo;
+    Semaforo *aux = NULL;
+    
+    while(nodo != NULL)
+    {
+        if(nodo->get_dato()->get_ubicacion() == v->get_origen()){
+			aux = nodo->get_dato();
+			//continue;
+		}
+        nodo = nodo->get_next();
+    }
+	if(aux != NULL) {
+		if(!aux->rojo(v)) cout<<"El semaforo estaba colmado. No se pudo insertar el vehiculo mat.: "<<v->get_matricula()<<endl;		
+	}
+	else cout<<"Error en la busqueda del semaforo (UbicarMiAuto) "<<endl;
+
 }
 
 void Listasemaforos::print()
