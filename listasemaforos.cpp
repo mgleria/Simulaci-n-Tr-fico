@@ -34,7 +34,7 @@ class Listasemaforos{
             Semaforo* busca_SemaforoNumero2(Nodosemaforo*, int);   //metodo recursivo que llega hasta un Nodosemaforo y devuelve su semaforo
             void ordenar();                                        //se utiliza para ordenar la lista de semaforos mediante una implementacion de insert-sort...
             
-            void print_TODO();
+            void print_TODO(Vehiculo *);
             void print();										   //Imprime todos los semaforos
             void print(string);                                    //recibe el tipo de impresion que se desea realizar y llama a su metodo
             void print_TOP10(Nodosemaforo*, int);                  //imprime en pantalla los diez primeros semaforos de la lista
@@ -111,8 +111,8 @@ void Listasemaforos::ordenar()
     int i, j;
     for(i=0 ; i<cantSemaforos ; i++)
     {
-        aux[i] = czo->get_dato();
-        this->eliminar();
+        aux[i] = czo->get_dato();		//Copio la cabeza de ListaSemaforos en aux[i]
+        this->eliminar();				//Elimino el nodo de ListaSemaforos
     }
     for(i=1 ; i<cantSemaforos ; i++) //IMPLEMENTACION DE UN INSERT-SORT
     {
@@ -178,16 +178,21 @@ void Listasemaforos::print()
     }
 }
 
-void Listasemaforos::print_TODO()
+void Listasemaforos::print_TODO(Vehiculo *miAuto)
 { 
     Nodosemaforo *nodo = czo;
     int cont=0;
+    
+    //miAuto->print_DatosVehiculo();
     while(nodo != NULL)
     {	
 		cont++;
-		cout<<setw(100) << setiosflags(ios::right) <<"Semaforo numero: "<<cont<<".   ";
+		if(nodo->get_dato()->get_cantidadDeVehiculos() != 0)
+		{
+		cout<<setw(120) << setiosflags(ios::right) <<"Semaforo numero: "<<cont<<".   ";
 		nodo->get_dato()->print();
         nodo->get_dato()->print_AUTOS();
+		}
         nodo = nodo->get_next();
     }
 }

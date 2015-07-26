@@ -169,6 +169,7 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 
 void recalculando(Grafo *city, Vehiculo *myCar)
 {
+	city->actualizarMA(S);
 	myCar->set_camino(city->dijkstra(myCar->get_posicionActual(),myCar->get_destino()));
 }
 
