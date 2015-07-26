@@ -201,7 +201,7 @@ void Vehiculo::print_DatosVehiculo3()
     << setw(7) << posicion_actual<<endl;
     cout<<"El camino por recorrer es: ";
     this->print_camino();
-    cout<<endl<<"El camino ya realizado es: ";
+    cout<<"El camino ya realizado es: ";
 	this->print_recorrido();
 	}
 	else cout<<endl<<"El vehiculo no es valido"<<endl;
@@ -227,6 +227,6 @@ void Vehiculo::print_recorrido()
 
 void Vehiculo::print_camino()
 {
-    if(this->camino->esvacia()) cout << endl << " --> DESTINO alcanzado" << endl;
+    if(this->camino->esvacia()) cout << endl << " --> DESTINO alcanzado"<<endl;
     else camino->print();
 }

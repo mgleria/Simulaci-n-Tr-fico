@@ -87,7 +87,7 @@ void simular(Grafo *city,Listasemaforos *S,Vehiculo *myCar)
 	if(miSem->rojo(myCar))	//Al ubicar 'myCar' en el semaforo de Origen, pasa a manejarse como un Vehiculo mas de la simulación.
 	{
 								
-		while(myCar->get_destino() != myCar->get_posicionActual()&&iteracion<100){ //Mi auto llegó a destino?? (Condicion de parada de la simuación)
+		while(myCar->get_destino() != myCar->get_posicionActual()){ //Mi auto llegó a destino?? (Condicion de parada de la simuación)
 			
 			iteracion++;
 			ordenarSemaforos(S);			//Ordeno los semáforos en función del tráfico			

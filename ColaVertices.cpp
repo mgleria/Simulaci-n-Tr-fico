@@ -16,7 +16,7 @@ class ColaVertices{
             ColaVertices() {czo=NULL;};                  //constructor para la creacion de la ColaVertices
             ~ColaVertices(void);                         //destructor de la ColaVertices
             Nodo *get_comienzo() {return czo;};
-            int cabeza(void) {return czo->get_dato();};  //Retorna el primer elemento de la cola.
+            int cabeza(void);  						//Retorna el primer elemento de la cola.
             void agregar(int d);                         //agrega un elemento a la ColaVertices
             void agregar_final(int d);                   //agrega un dato al final de la ColaVertices
             void eliminar(void);                         //elimina el frente de la ColaVertices
@@ -38,6 +38,13 @@ void ColaVertices::eliminar()
     aux = czo;
     czo = czo->get_next();
     delete aux;
+}
+
+int ColaVertices::cabeza()
+{
+	if(esvacia())return -1;
+	else return czo->get_dato();
+
 }
 
 void ColaVertices::agregar(int d)

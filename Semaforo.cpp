@@ -75,7 +75,7 @@ void Semaforo::print(){
 		cout<<"Cant. Vehiculos: "<<setw(3)<<get_cantidadDeVehiculos()
 		<<endl;
 	}
-	else cout<<endl<<"El semaforo NO es valido"<<endl;
+	else cout<<endl<<"El semaforo NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO es valido"<<endl;
 }
 
 //Imprime la información de todos los autos del semaforo

@@ -114,12 +114,13 @@ void Listasemaforos::ordenar()
         aux[i] = czo->get_dato();		//Copio la cabeza de ListaSemaforos en aux[i]
         this->eliminar();				//Elimino el nodo de ListaSemaforos
     }
+    
     for(i=1 ; i<cantSemaforos ; i++) //IMPLEMENTACION DE UN INSERT-SORT
     {
         j=i-1;
         while(j>=0)
         {
-            if(((aux[j+1])->congestion()) < ((aux[j])->congestion()))
+            if(((aux[j+1])->congestion()) <= ((aux[j])->congestion()))
             {
                 temp = aux[j+1];
                 aux[j+1]=aux[j];
@@ -195,6 +196,7 @@ void Listasemaforos::print_TODO(Vehiculo *miAuto)
 		}
         nodo = nodo->get_next();
     }
+    
 }
 
 void Listasemaforos::print(string t)
