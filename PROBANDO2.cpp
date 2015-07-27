@@ -35,14 +35,12 @@ int main(void){
 	Vehiculo *v3=new Vehiculo();
 	Vehiculo *miAuto = new Vehiculo("Auto",9999,0,15);      //Creo el vehiculo que pretendo conducir
 	
-	
-	
-	S->ubicarAleatorio(v1);
-	S->ubicarAleatorio(v2);
-	S->ubicarAleatorio(v3);
-	S->ubicarAleatorio(miAuto);
-
-	S->print_TODO();
+	ofstream prueba;
+    prueba.open("Prueba.txt");
+    
+    prueba<<cout<<"Hola mundo"<<endl;
+    
+    
 
 	return 0;
 }

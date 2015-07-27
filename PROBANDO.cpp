@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <fstream>
+#include <sstream>
+#include <string> 
 
 using namespace std;
 
@@ -18,7 +20,8 @@ using namespace std;
 #include "listasemaforos.cpp" 
 #include "GrafoCiudad.cpp"
 
-void generarTrafico(Grafo *city, int nAutos, int nPatrulleros, int nAmbulancias,Listasemaforos* S);
+void generarTrafico(Grafo*,int,int,int,Listasemaforos*);
+void simular(Grafo*,Listasemaforos*,Vehiculo*);				//Este método corre la simulación hasta que miAuto llega a destino
 void verde(Semaforo *,Listasemaforos *);	//Metodo que permite el paso de vehiculos en la cantidad n por carril y envía, de ser posible,
 											//los autos al siguiente semaforo destino. 
 void recalculando(Grafo *, Vehiculo *);
@@ -26,27 +29,32 @@ void recalculando(Grafo *, Vehiculo *);
 int main(void){
 	Grafo *ciudad=new Grafo();
 	Listasemaforos *Semaforos=new Listasemaforos();
-	Semaforo *semaforo;
+	Nodosemaforo *nodo;
+	Semaforo *semAux;
+	Vehiculo *miAuto = new Vehiculo("Auto",9999,15,0);      //Creo el vehiculo que pretendo conducir. Ruta por defecto: []
+	int iteracion=0;
+	string p;
 	
 	ciudad->launch(Semaforos);
 	
 	generarTrafico(ciudad,70,20,10,Semaforos);
-
-	Vehiculo *miAuto = new Vehiculo("Auto",9999,15,0);      //Creo el vehiculo que pretendo conducir
-
+	
 	Semaforos->ubicarMiAuto(miAuto);
 
 	miAuto->set_camino(ciudad->dijkstra(miAuto->get_origen(),miAuto->get_destino()));
 	
 	Semaforos->ordenar();
-	//~ Semaforos->print_TODO(miAuto);
 	
-	Nodosemaforo *nodo;
-	Semaforo *semAux;
-	int iteracion=0;		
+	ostringstream os;
+	os << "##################################  COMIENZO DE LA SIMULACION DE TRÁFICO   ##################################"<<endl;
+    os << "-----------------------ITERACION: " << iteracion << "-------------------------------------------" << endl;
+    p = os.str();
+	
+	Semaforos->print_TODO_file(p,iteracion);		
 
 	while(miAuto->get_posicionActual()!=miAuto->get_destino())
 	{
+
 		nodo = Semaforos->get_czo();
 		iteracion++;
 		while(nodo!=NULL){
@@ -56,18 +64,23 @@ int main(void){
 		}
 		Semaforos->ordenar();
 		
+		os.str(""); os.clear();
+		os << endl<<endl<<"-----------------------ITERACION: " << iteracion << "-------------------------------------------" << endl;
+		p = os.str();
+		Semaforos->print_TODO_file(p,iteracion);
+		
 		if((iteracion%2)==0&&(miAuto->get_posicionActual()!= miAuto->get_destino())){	//Recalculo el recorrido de mi auto cada 2 iteraciones
 			cout<<"Recalculando..."<<endl;
 			ciudad->actualizarMA(Semaforos);
 			cout<<"Pos_actual: "<<miAuto->get_posicionActual();
-			//~ recalculando(ciudad,miAuto);
+			recalculando(ciudad,miAuto);
 		}
 		
 		cout<<endl<<"-----------------------ITERACION: "<<iteracion<<"-------------------------------------------"<<endl;
 		miAuto->print_DatosVehiculo3();
 	}
 	
-	//~ Semaforos->print_TODO(miAuto);
+	Semaforos->print_TODO_file("\n\nEstado FINAL de los semaforos \n",iteracion);
 
 	return 0;
 }
@@ -165,7 +178,8 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 
 void recalculando(Grafo *city, Vehiculo *myCar)
 {
-	myCar->set_camino(city->dijkstra(myCar->get_posicionActual(),myCar->get_destino()));
+	city->dijkstra(myCar->get_posicionActual(),myCar->get_destino())->print();
+	//~ myCar->set_camino(city->dijkstra(myCar->get_posicionActual(),myCar->get_destino()));
 }
 
 

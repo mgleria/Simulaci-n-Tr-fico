@@ -26,8 +26,10 @@ class HeapMin{
             bool insertar(Vehiculo *);  //recibe un Vehiculo y lo inserta en el heap según su prioridad. Retorna true si pudo hacerlo.
             Vehiculo *extraer(); 		//Devuelve el elemento de mayor prioridad y re-construye el heap.
 			Vehiculo *first(); 			//Devuelve el primer elemento del heap sin modificarlo.
+			
 			void print(); 				//Imprime el heap.
 			void print_FULL();
+			string print_FULL_file();
 						                                        
             bool heap_lleno(void) 
             {return Vehiculos.size()==capacidad;};      //devuelve true si el heap está lleno. false si tiene al menos un lugar.
@@ -147,4 +149,14 @@ void HeapMin::print_FULL(){
 	else{	
 		for(int i=0;i<Vehiculos.size();i++)	Vehiculos.at(i)->print_DatosVehiculo3();
 		} 
+}
+
+string HeapMin::print_FULL_file(){
+	std::ostringstream stm;
+	
+	if(heap_vacio()) stm<<"El Heap esta vacio"<<endl;
+	else{	
+		for(int i=0;i<Vehiculos.size();i++)	stm<<Vehiculos.at(i)->print_DatosVehiculo_file();
+		} 
+	return stm.str();
 }

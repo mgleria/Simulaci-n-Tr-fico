@@ -21,9 +21,14 @@ class Vehiculo{
             void print_DatosVehiculo2(void); 
             void print_DatosVehiculo3(void);
 			void print_encabezado(); 
+			string print_DatosVehiculo_file();
 			
             void print_recorrido(void);                             //imprime en pantalla el camino ya recorrido por el vehiculo
             void print_camino(void);                                //imprime en pantalla el camino que debe recorrer el vehiculo
+            string print_camino_file();
+            string print_recorrido_file();
+            
+            
             void set_camino(ColaVertices*);                         //setea la lista de vertices a seguir para completar el recorrido
             void put_recorrido(int p) {recorrido->agregar(p);};     //agrega una esquina al recorrido ya hecho por el vehiculo
             int get_siguiente(void) {return camino->cabeza();};     //devuelve la siguiente posicion a la que se debe dirigir el vehiculo
@@ -133,6 +138,8 @@ void Vehiculo::set_camino(ColaVertices* aux)
 	//~ camino->~ColaVertices();
 	//~ camino = aux;
 	
+	camino = new ColaVertices();
+	
 	Nodo *nodo = aux->get_comienzo();	
     while(nodo != NULL){
 		camino->agregar(nodo->get_dato());
@@ -207,6 +214,27 @@ void Vehiculo::print_DatosVehiculo3()
 	else cout<<endl<<"El vehiculo no es valido"<<endl;
 }
 
+string Vehiculo::print_DatosVehiculo_file()
+{
+	std::ostringstream stm;
+	
+	if(this!=NULL){
+    stm << endl 
+    << setw(10) << tipo
+    << setw(10) << matricula
+    << setw(7) << origen
+    << setw(7) << destino
+    << setw(7) << posicion_actual<<endl;
+    stm<<"El camino por recorrer es: ";
+    stm<<print_camino_file();
+    stm<<"El camino ya realizado es: ";
+	stm<<print_recorrido_file();
+	}
+	else stm<<endl<<"El vehiculo no es valido"<<endl;
+	
+	return stm.str();
+}
+
 void Vehiculo::print_encabezado()
 {
     cout << endl << setw(10) << setiosflags(ios::left) 
@@ -229,4 +257,22 @@ void Vehiculo::print_camino()
 {
     if(this->camino->esvacia()) cout << endl << " --> DESTINO alcanzado"<<endl;
     else camino->print();
+}
+
+string Vehiculo::print_recorrido_file()
+{
+	std::ostringstream stm;
+    if(this->recorrido->esvacia()) stm << endl << " --> En ORIGEN" << endl;
+    else stm<<recorrido->print_file();
+    
+    return stm.str();
+}
+
+string Vehiculo::print_camino_file()
+{
+	std::ostringstream stm;
+    if(this->camino->esvacia()) stm << endl << " --> DESTINO alcanzado"<<endl;
+    else stm<<camino->print_file();
+    
+    return stm.str();
 }

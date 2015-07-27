@@ -17,6 +17,7 @@ class Semaforo{
 			int get_ubicacion(){return ubicacion;};
 			int get_procedencia(){return procedencia;};
 			int get_carriles(){return carriles;};
+			int get_capacidad_cola() {return colaVehiculos->get_capacidad();};
 			bool get_estado() {return bloqueado;};
 			void bloquear() {bloqueado = true;};
 			void desbloquear() {bloqueado = false;};
@@ -28,6 +29,7 @@ class Semaforo{
 			int get_cantidadDeVehiculos();
 			void print();
 			void print_AUTOS();
+			string print_AUTOS_file();
 			
 			bool rojo(Vehiculo*);		//Este método es el que recibe los autos para encolarlos, si es que la 
 										//capacidad no está colmada.
@@ -85,5 +87,18 @@ void Semaforo::print_AUTOS(){
 		colaVehiculos->print_FULL();
 	}
 	else cout<<endl<<"El semaforo NO tiene Vehiculos"<<endl;
+}
+
+//Imprime la información de todos los autos del semaforo
+string Semaforo::print_AUTOS_file(){
+	
+	std::ostringstream stm;
+	
+	if(!colaVehiculos->heap_vacio()){
+		stm<<colaVehiculos->print_FULL_file();
+	}
+	else stm<<endl<<"El semaforo NO tiene Vehiculos"<<endl;
+	
+	return stm.str();
 }
 

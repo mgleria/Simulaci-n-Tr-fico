@@ -34,7 +34,8 @@ class Listasemaforos{
             Semaforo* busca_SemaforoNumero2(Nodosemaforo*, int);   //metodo recursivo que llega hasta un Nodosemaforo y devuelve su semaforo
             void ordenar();                                        //se utiliza para ordenar la lista de semaforos mediante una implementacion de insert-sort...
             
-            void print_TODO(Vehiculo *);
+            void print_TODO_file(string,int);
+            void print_TODO();
             void print();										   //Imprime todos los semaforos
             void print(string);                                    //recibe el tipo de impresion que se desea realizar y llama a su metodo
             void print_TOP10(Nodosemaforo*, int);                  //imprime en pantalla los diez primeros semaforos de la lista
@@ -202,24 +203,60 @@ void Listasemaforos::print()
     }
 }
 
-void Listasemaforos::print_TODO(Vehiculo *miAuto)
+void Listasemaforos::print_TODO()
 { 
     Nodosemaforo *nodo = czo;
     int cont=0;
     
-    //miAuto->print_DatosVehiculo();
     while(nodo != NULL)
     {	
 		cont++;
-		if(nodo->get_dato()->get_cantidadDeVehiculos() != 0)
-		{
 		cout<<setw(120) << setiosflags(ios::right) <<"Semaforo numero: "<<cont<<".   ";
 		nodo->get_dato()->print();
         nodo->get_dato()->print_AUTOS();
-		}
         nodo = nodo->get_next();
     }
     
+}
+
+void Listasemaforos::print_TODO_file(string p,int iter)
+{ 
+    ofstream salidaSemaforos;
+    salidaSemaforos.open("RankingSemaforos.txt", std::ofstream::out | std::ofstream::app);
+    
+    Nodosemaforo *aux;
+    aux = czo;
+	std::ostringstream stm;
+	int cont=0;
+    
+    stm << p; //Agrego el string que recibió como parámetro
+
+    while(aux != NULL)
+    {
+		cont++;
+		stm << endl << setw(11) << setiosflags(ios::left) << "Semaforo nro.: "<<cont
+		<<"   Iteracion: "<<iter<<endl; 
+		stm << setw(11) << setiosflags(ios::left) << "|| Esquina " 
+			<< setw(11) << setiosflags(ios::left) << "|| Presedencia " 
+			<< setw(11) << setiosflags(ios::left) << "|| Carriles " 
+			<< setw(11) << setiosflags(ios::left) << "|| Saturacion %"
+			<< setw(11) << setiosflags(ios::left) << "|| Cant_Vehiculos ";
+		stm << endl << "-----------------------------------------------------------"<<endl;
+		
+        stm << "|| " << setw(7) << setiosflags(ios::left) << (aux->get_dato())->get_ubicacion();
+        stm << " || " << setw(11) << setiosflags(ios::left) << (aux->get_dato())->get_procedencia();
+        stm << " || " << setw(8) << setiosflags(ios::left) << (aux->get_dato())->get_carriles();
+        stm << " || " << setw(11) << setiosflags(ios::left) << (aux->get_dato())->congestion();
+        stm << " || " << setw(3) << setiosflags(ios::left) << (aux->get_dato())->get_cantidadDeVehiculos()<<endl;
+        stm << aux->get_dato()->print_AUTOS_file();
+        
+        aux = aux->get_next();
+    }
+    
+    salidaSemaforos << stm.str();
+    salidaSemaforos.close();
+       
+     
 }
 
 void Listasemaforos::print(string t)
@@ -246,13 +283,13 @@ void Listasemaforos::print_ArchivoSemaforos()
 					<< setw(11) << setiosflags(ios::left) << "|| Presedencia " 
 					<< setw(11) << setiosflags(ios::left) << "|| Carriles " 
 					<< setw(11) << setiosflags(ios::left) << "|| Saturacion ";
-    salidaSemaforos << endl << "-----------------------------------------------------------";
+    salidaSemaforos << endl << "-----------------------------------------------------------"<<endl;
     while(aux != NULL)
     {
         salidaSemaforos << " || " << setw(7) << setiosflags(ios::left) << (aux->get_dato())->get_ubicacion();
         salidaSemaforos << " || " << setw(11) << setiosflags(ios::left) << (aux->get_dato())->get_procedencia();
         salidaSemaforos << " || " << setw(8) << setiosflags(ios::left) << (aux->get_dato())->get_carriles();
-        salidaSemaforos << " || " << setw(3) << setiosflags(ios::left) << (aux->get_dato())->congestion();
+        salidaSemaforos << " || " << setw(3) << setiosflags(ios::left) << (aux->get_dato())->congestion()<<endl;
         
         aux = aux->get_next();
     }

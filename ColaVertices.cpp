@@ -13,16 +13,17 @@ class ColaVertices{
     protected:
             Nodo *czo;
     public:
-            ColaVertices() {czo=NULL;};                  //constructor para la creacion de la ColaVertices
-            ~ColaVertices(void);                         //destructor de la ColaVertices
+            ColaVertices() {czo=NULL;};                  	//constructor para la creacion de la ColaVertices
+            ~ColaVertices(void);                         	//destructor de la ColaVertices
             Nodo *get_comienzo() {return czo;};
-            int cabeza(void);  						//Retorna el primer elemento de la cola.
-            void agregar(int d);                         //agrega un elemento a la ColaVertices
-            void agregar_final(int d);                   //agrega un dato al final de la ColaVertices
-            void eliminar(void);                         //elimina el frente de la ColaVertices
-            bool buscar(int);                            //devuelve 1 si un vertice esta en la lista y 0 si no
-            void print(void);                            //impresion de la ColaVertices en pantalla
-            bool esvacia(void) {return czo==NULL;};      //Determina si la Cola esta vacía.
+            int cabeza(void);  								//Retorna el primer elemento de la cola.
+            void agregar(int d);                         	//agrega un elemento a la ColaVertices
+            void agregar_final(int d);                   	//agrega un dato al final de la ColaVertices
+            void eliminar(void);                         	//elimina el frente de la ColaVertices
+            bool buscar(int);                            	//devuelve 1 si un vertice esta en la lista y 0 si no
+            void print(void);                            	//impresion de la ColaVertices en pantalla
+            string print_file(void);						//Impresion de la ColaVertices a un objeto stm que se retorna al final
+            bool esvacia(void) {return czo==NULL;};      	//Determina si la Cola esta vacía.
             
 };
 
@@ -94,4 +95,20 @@ void ColaVertices::print(void)
         aux = aux->get_next();
     }
     cout << endl;
+}
+
+string ColaVertices::print_file(void)
+{
+	std::ostringstream stm; 
+    Nodo *aux;
+    aux = czo;
+    stm << endl;
+    while(aux != NULL)
+    {
+        stm << " --> " << aux->get_dato();
+        aux = aux->get_next();
+    }
+    stm << endl;
+    
+    return stm.str();
 }
