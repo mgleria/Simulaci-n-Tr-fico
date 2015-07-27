@@ -8,7 +8,7 @@ class Semaforo{
 			int ubicacion;
 			int procedencia;
 			int carriles;
-			bool bloqueado;
+			bool locked;
 			HeapMin *colaVehiculos;
 
 	public:
@@ -18,9 +18,9 @@ class Semaforo{
 			int get_procedencia(){return procedencia;};
 			int get_carriles(){return carriles;};
 			int get_capacidad_cola() {return colaVehiculos->get_capacidad();};
-			bool get_estado() {return bloqueado;};
-			void bloquear() {bloqueado = true;};
-			void desbloquear() {bloqueado = false;};
+			bool bloqueado() {return locked;};
+			void bloquear() {locked = true;};
+			void desbloquear() {locked = false;};
 			bool is_full(){ return colaVehiculos->heap_lleno(); };
 			
 			HeapMin *get_ColaDelSemaforo(){ return colaVehiculos;};
@@ -43,7 +43,7 @@ Semaforo::Semaforo(int c, int IDnodo, int proc){
 		ubicacion=IDnodo;
 		procedencia=proc;
 		carriles=c;
-		bloqueado = false;
+		locked = false;
 		
 		int capacidad_cola = 3*N*c;
 		colaVehiculos=new HeapMin(capacidad_cola);

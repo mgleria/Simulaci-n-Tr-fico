@@ -14,7 +14,6 @@ using namespace std;
 #define cantNODOS 16				//Cantidad de esquinas que tiene el plano de la ciudad
 #define cantSemaforos 36    		//Cantidad de semáforos que tiene en total la ciudad 
 
-#include "Nodo.cpp"
 #include "ColaVertices.cpp"
 #include "HeapMinVehiculos.cpp"
 #include "listasemaforos.cpp" 
@@ -33,7 +32,7 @@ int main(void){
 	
 	ciudad->launch(Semaforos);
 	
-	generarTrafico(ciudad,100,20,10,Semaforos);
+	generarTrafico(ciudad,420,20,10,Semaforos);
 	
 	simular(ciudad,Semaforos,miAuto);
 
@@ -114,14 +113,10 @@ void simular(Grafo *ciudad,Listasemaforos *Semaforos,Vehiculo *miAuto)
 
 		nodo = Semaforos->get_czo();
 		iteracion++;
-		//~ int a=0; //SACAR
+
 		while(nodo!=NULL){
-			//~ a++; //SACAR
 			semAux = nodo->get_dato();
-			//~ cout<<"Antes del verde: "<<a<<endl;//SACAR
-			//~ semAux->print();
 			verde(semAux,Semaforos);
-			//~ cout<<"DesPues del verde: "<<a<<endl;//SACAR
 			nodo = nodo->get_next();
 		}
 		Semaforos->ordenar();
@@ -158,49 +153,57 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 	int contVehiculos=0;			//contador para controlar la cantidad de vehículos que 'cruzan' un semaforo
 	semActual->desbloquear();		//Si el semaforo quedo bloaqueado, se desbloquea aca.
 	
+	cout<<"ENTRO A VERDE"<<endl;
+	
 	colaSem = semActual->get_ColaDelSemaforo();
 	
 	if(colaSem->heap_vacio()){ 	//Si la cola del semaforo no existe o está vacia:
 	semActual->bloquear();							//el semaforo se bloquea para que la simulación continue.
-	//~ cout<<"Se bloqueo el semaforo por cola_vacia"<<endl; 
+	cout<<"Se bloqueo el semaforo por cola_vacia"<<endl; 
 	}
 	if(colaSem == NULL){ 	//Si la cola del semaforo no existe o está vacia:
 	semActual->bloquear();							//el semaforo se bloquea para que la simulación continue.
-	//~ cout<<"Se bloqueo el semaforo por cola_NULL"<<endl; 
+	cout<<"Se bloqueo el semaforo por cola_NULL"<<endl; 
 	}    						
 
-	while(contVehiculos<N*(semActual->get_carriles())&&(!semActual->get_estado())) //Deja pasar n*carriles vehiculos
-	{
+	while(contVehiculos<N*(semActual->get_carriles())&&(!semActual->bloqueado())) //Deja pasar n*carriles vehiculos mientras el semaforo no este bloqueado
+	{	cout<<"!semActual->get_estado(): "<<!semActual->bloqueado()<<endl;
 		vehiculo=colaSem->first(); //Tomo el primer vehiculo de la cola del semaforo
 		
-		if(vehiculo!=NULL){
+		if(vehiculo!=NULL && vehiculo->circulando()){
 
 			if(vehiculo->get_posicionActual()==vehiculo->get_destino()){ //Si ya llegó al destino
 				colaSem->extraer(); //Extraigo el vehiculo de la cola del semaforo, y no lo ubico en ningún otro lugar. 
 				semActual->bloquear(); //Bloqueo el semaforo.
+				break;
 			}
 			if(vehiculo->get_posicionActual()==vehiculo->get_origen()){ //Si todavía no se movió del origen: Primer movimiento
 				vehiculo->put_recorrido(vehiculo->get_siguiente()); 	//Cargo el primer elemento (cabeza) en la cola de vertices recorrido
-				vehiculo->borrar_cabeza(); 								//Si no borro el primer elemento, pierdo una iteracion moviendome a donde ya estoy
+				//Comentar este if
+				if(!vehiculo->borrar_cabeza()){ //Si no borro el primer elemento, pierdo una iteracion moviendome a donde ya estoy
+					semActual->bloquear();
+					cout<<"Colavertices vacia en pos_actual=origen"<<endl;
+					vehiculo->print_DatosVehiculo3();
+					break;
+				}	
 			}
-			
+			//Comentar
 			if(vehiculo->get_posicionActual()==vehiculo->get_siguiente()){ 	//Si entra aca es porque recalculo dijkstra???
-				//~ cout<<"Entro al IF que borra la cabeza"<<endl;
-				vehiculo->borrar_cabeza(); 									//
+				if(!vehiculo->borrar_cabeza()){ 
+					semActual->bloquear();
+					cout<<"Colavertices vacia en pos_actual=get_siguiente"<<endl;
+					break;
+				}										
 			}
-			
 			
 			nextNodo=vehiculo->get_siguiente();
 
 			if(nextNodo>=0) {
 				nextSemaforo=S->buscar(nextNodo,semActual->get_ubicacion()); //S->buscar(NodoUbicacion, nodoProcedencia)
-				//~ cout<<"nextNodo: "<<nextNodo<<"   semActual->get_ubicacion(): "<<semActual->get_ubicacion()<<endl;
-				//~ vehiculo->print_DatosVehiculo3();
-				//~ nextSemaforo->print();
 				
-				if((!nextSemaforo->is_full())&&(nextSemaforo!=NULL)){ //Si el proximo semaforo NO está lleno y si existe:
-					vehiculo = colaSem->extraer(); //Extraigo el vehiculo del semaforo actual
+				if(nextSemaforo!=NULL){ //Si el proximo semaforo NO está lleno y si existe:
 					if(nextSemaforo->rojo(vehiculo)){  //Si hay lugar en 'nextSemaforo', encolo 'vehiculo'
+						vehiculo = colaSem->extraer(); //Extraigo el vehiculo del semaforo actual
 						vehiculo->set_posicionActual(nextSemaforo->get_ubicacion());
 						vehiculo->put_recorrido(vehiculo->get_siguiente()); //Cargo el elemento en la cola de vertices recorridos
 						vehiculo->borrar_cabeza(); //Borro el salto que ya hizo el vehiculo en su camino.
@@ -212,15 +215,20 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 			}
 			else semActual->bloquear(); //El semaforo al que se dirigía estaba lleno o no existía
 		}
-		else semActual->bloquear(); //El vehiculo no existe, seguramente la cola del semaforo esta vacía. 
+		else {
+			semActual->bloquear(); //El vehiculo no existe o ya llego a destino
+			if(vehiculo != NULL) colaSem->extraer();
+			else cout<<"VEHICULO NUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"<<endl;
+		}
+			
 	}
+	cout<<"SALIO DE VERDE"<<endl;
 }
 
 void recalculando(Grafo *city, Vehiculo *myCar)
 {
 	ColaVertices *nuevoCamino;
 	nuevoCamino = city->dijkstra(myCar->get_posicionActual(),myCar->get_destino());
-	//~ nuevoCamino->eliminar();
 	cout<<"nuevoCamino->print(): ";
 	nuevoCamino->print();
 	cout<<endl;

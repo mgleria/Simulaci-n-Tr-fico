@@ -124,7 +124,7 @@ void Listasemaforos::ordenar()
         j=i-1;
         while(j>=0)
         {
-            if(((aux[j+1])->congestion()) <= ((aux[j])->congestion()))
+            if(((aux[j+1])->get_cantidadDeVehiculos()) <= ((aux[j])->get_cantidadDeVehiculos()))
             {
                 temp = aux[j+1];
                 aux[j+1]=aux[j];

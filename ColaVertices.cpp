@@ -1,4 +1,38 @@
 /*
+ * Esta clase brinda la estructura primaria para la clase ColaVertices.
+ * Cada Nodo representa un vértice del grafo que representa el plano de
+ * la ciudad. Los datos que lo componen son el nro. de vértice (dato) y
+ * el peso relativo del mismo (peso). El campo next se utiliza para 
+ * enlazar los nodos y lograr una estructura mas compleja, una cola en  
+ * este caso. 
+ * Los métodos de esta clase son los básicos para manipular los miembros
+ * de datos recien descriptos.
+ * La clase Nodo es usada por la clase ColaVertices.
+ * */
+class Nodo{
+    private:
+            int dato;
+            int peso;
+            Nodo *next;
+    public:
+		   Nodo() {next=NULL;};   //este constructor se utiliza al añadir elementos
+		   Nodo(int a) {dato=a; next=NULL;};   //este constructor se utiliza al añadir elementos
+		   Nodo(int a, int b) {dato=a; peso=b; next=NULL;};   //este constructor se utiliza al añadir elementos
+		   void set_dato(int a) {dato=a;};            //setea la variable dato del Nodo en cuestion
+		   void set_next(Nodo *n) {next=n;};   //recibe la direccion de un Nodo y la guarda en el next de nuevo
+		   int get_dato() {return dato;};             //devuelve el campo dato del Nodo desde que se llamo a este metodo
+		   int get_peso() {return peso;};
+		   Nodo *get_next() {return next;};    //devuelve la direccion de memoria a la que apunta el puntero a Nodo next
+		   void print();
+};
+
+void Nodo::print()
+{
+	cout<<"ID del nodo: "<<dato<<". Peso de la arista hacia origen :"<<peso<<"."<<endl;
+}
+
+
+/*
 * Esta clase es una cola de Nodo(s) que representan los nodos del grafo 
 * de la ciudad que se modeliza. Los nodos son los vértices del grafo, 
 * que a su vez son las ESQUINAS del plano de la ciudad.
@@ -7,8 +41,6 @@
 * ED.
 * La clase ColaVertices es usada por la clase Grafo.
 */
-
-
 class ColaVertices{ 
     protected:
             Nodo *czo;
@@ -19,7 +51,7 @@ class ColaVertices{
             int cabeza(void);  								//Retorna el primer elemento de la cola.
             void agregar(int d);                         	//agrega un elemento a la ColaVertices
             void agregar_final(int d);                   	//agrega un dato al final de la ColaVertices
-            void eliminar(void);                         	//elimina el frente de la ColaVertices
+            bool eliminar(void);                         	//elimina el frente de la ColaVertices. Retorna true si tuvo exito.
             bool buscar(int);                            	//devuelve 1 si un vertice esta en la lista y 0 si no
             void print(void);                            	//impresion de la ColaVertices en pantalla
             string print_file(void);						//Impresion de la ColaVertices a un objeto stm que se retorna al final
@@ -33,12 +65,20 @@ ColaVertices::~ColaVertices(void)
     this->eliminar();
 }
 
-void ColaVertices::eliminar()
+bool ColaVertices::eliminar()
 {
     Nodo *aux;
     aux = czo;
-    czo = czo->get_next();
-    delete aux;
+    if(!esvacia()){ 
+		czo = czo->get_next();
+		delete aux;
+		return true;
+	}
+    else{
+		cout<<"ColaVertices vacia"<<endl;
+		return false;
+	}
+    
 }
 
 int ColaVertices::cabeza()
