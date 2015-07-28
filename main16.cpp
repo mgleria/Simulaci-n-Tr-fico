@@ -19,20 +19,49 @@ using namespace std;
 #include "listasemaforos.cpp" 
 #include "GrafoCiudad.cpp"
 
-void generarTrafico(Grafo*,int,int,int,Listasemaforos*);
+void generarTrafico(Grafo*,int,int,int,Listasemaforos*);	
 void simular(Grafo*,Listasemaforos*,Vehiculo*);				//Este método corre la simulación hasta que miAuto llega a destino
-void verde(Semaforo *,Listasemaforos *);	//Metodo que permite el paso de vehiculos en la cantidad n por carril y envía, de ser posible,
-											//los autos al siguiente semaforo destino. 
+void verde(Semaforo *,Listasemaforos *);					//Metodo que permite el paso de vehiculos en la cantidad n por carril y envía, de ser posible,
+															//los autos al siguiente semaforo destino. 
 void recalculando(Grafo *, Vehiculo *);
 
 int main(void){
 	Grafo *ciudad=new Grafo();
 	Listasemaforos *Semaforos=new Listasemaforos();
-	Vehiculo *miAuto = new Vehiculo("Auto",9999,15,0);      //Creo el vehiculo que pretendo conducir. Ruta por defecto: []
+	int miOrigen, miDestino,cAutos,cPatrulleros,cAmbulancias;
 	
+	miOrigen=15; miDestino=0;
+	cAutos=100; cPatrulleros=20; cAmbulancias=10;
+	
+	cout<<"#############################  BIENVENIDO A LA SIMULACION DE TRAFICO  #############################"<<endl<<endl;	
+	cout<<"Ingrese desde donde desea que inicie su vehiculo: ";
+	cin>>miOrigen;
+	cout<<endl<<"Ingrese el destino que pretende: ";
+	cin>>miDestino;
+	
+	while(miOrigen<0|miOrigen>=cantNODOS|miDestino<0|miDestino>=cantNODOS)
+	{
+		cout<<endl<<"Origen y/o destino incorrectos. Por favor reingresar."<<endl;
+		cout<<"Ingrese desde donde desea que inicie su vehiculo: ";
+		cin>>miOrigen;
+		cout<<endl<<"Ingrese el destino que pretende: ";
+		cin>>miDestino;
+	}
+	
+	cout<<endl<<"Ingrese la cantidad de AUTOS a crear: ";
+	cin>>cAutos;
+	cout<<endl<<"Ingrese la cantidad de PATRULLEROS a crear: ";
+	cin>>cPatrulleros;
+	cout<<endl<<"Ingrese la cantidad de AMBULANCIAS a crear: ";
+	cin>>cAmbulancias;
+	
+	
+	
+	Vehiculo *miAuto = new Vehiculo("Auto",9999,miOrigen,miDestino);      //Creo el vehiculo que pretendo conducir. Ruta por defecto: [15:0]
+		
 	ciudad->launch(Semaforos);
 	
-	generarTrafico(ciudad,420,20,10,Semaforos);
+	generarTrafico(ciudad,cAutos,cPatrulleros,cAmbulancias,Semaforos);
 	
 	simular(ciudad,Semaforos,miAuto);
 
@@ -82,8 +111,6 @@ void generarTrafico(Grafo *city, int nAutos, int nPatrulleros, int nAmbulancias,
 		cout<<"#####################  CERRANDO LA SIMULACION  #####################"<<endl;
 		exit(1);
 	}
-	
-	///Verificar que la cantidad de vehiculos en el heap sea igual a la cantidad de vehiculos ingresados
 }
 
 
@@ -132,7 +159,6 @@ void simular(Grafo *ciudad,Listasemaforos *Semaforos,Vehiculo *miAuto)
 		if((iteracion%2)==0&&(miAuto->get_posicionActual()!=miAuto->get_destino())){	//Recalculo el recorrido de mi auto cada 2 iteraciones
 			cout<<"Recalculando..."<<endl;
 			ciudad->actualizarMA(Semaforos);
-			//~ cout<<"Pos_actual: "<<miAuto->get_posicionActual();
 			recalculando(ciudad,miAuto);
 		}
 	}
@@ -153,47 +179,25 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 	int contVehiculos=0;			//contador para controlar la cantidad de vehículos que 'cruzan' un semaforo
 	semActual->desbloquear();		//Si el semaforo quedo bloaqueado, se desbloquea aca.
 	
-	cout<<"ENTRO A VERDE"<<endl;
-	
 	colaSem = semActual->get_ColaDelSemaforo();
 	
-	if(colaSem->heap_vacio()){ 	//Si la cola del semaforo no existe o está vacia:
+	if(colaSem->heap_vacio()||colaSem == NULL){ 	//Si la cola del semaforo no existe o está vacia:
 	semActual->bloquear();							//el semaforo se bloquea para que la simulación continue.
-	cout<<"Se bloqueo el semaforo por cola_vacia"<<endl; 
-	}
-	if(colaSem == NULL){ 	//Si la cola del semaforo no existe o está vacia:
-	semActual->bloquear();							//el semaforo se bloquea para que la simulación continue.
-	cout<<"Se bloqueo el semaforo por cola_NULL"<<endl; 
-	}    						
+	} 						
 
 	while(contVehiculos<N*(semActual->get_carriles())&&(!semActual->bloqueado())) //Deja pasar n*carriles vehiculos mientras el semaforo no este bloqueado
-	{	cout<<"!semActual->get_estado(): "<<!semActual->bloqueado()<<endl;
+	{	
 		vehiculo=colaSem->first(); //Tomo el primer vehiculo de la cola del semaforo
 		
 		if(vehiculo!=NULL && vehiculo->circulando()){
 
-			if(vehiculo->get_posicionActual()==vehiculo->get_destino()){ //Si ya llegó al destino
-				colaSem->extraer(); //Extraigo el vehiculo de la cola del semaforo, y no lo ubico en ningún otro lugar. 
-				semActual->bloquear(); //Bloqueo el semaforo.
-				break;
-			}
 			if(vehiculo->get_posicionActual()==vehiculo->get_origen()){ //Si todavía no se movió del origen: Primer movimiento
 				vehiculo->put_recorrido(vehiculo->get_siguiente()); 	//Cargo el primer elemento (cabeza) en la cola de vertices recorrido
-				//Comentar este if
-				if(!vehiculo->borrar_cabeza()){ //Si no borro el primer elemento, pierdo una iteracion moviendome a donde ya estoy
-					semActual->bloquear();
-					cout<<"Colavertices vacia en pos_actual=origen"<<endl;
-					vehiculo->print_DatosVehiculo3();
-					break;
-				}	
+				vehiculo->borrar_cabeza(); //Si no borro el primer elemento, pierdo una iteracion moviendome a donde ya estoy
 			}
-			//Comentar
-			if(vehiculo->get_posicionActual()==vehiculo->get_siguiente()){ 	//Si entra aca es porque recalculo dijkstra???
-				if(!vehiculo->borrar_cabeza()){ 
-					semActual->bloquear();
-					cout<<"Colavertices vacia en pos_actual=get_siguiente"<<endl;
-					break;
-				}										
+			
+			if(vehiculo->get_posicionActual()==vehiculo->get_siguiente()){ 	//Si entra aca es porque recalculo dijkstra, y este devuelve la ruta completa, en vez de lo que le falta para destino.
+				vehiculo->borrar_cabeza();				
 			}
 			
 			nextNodo=vehiculo->get_siguiente();
@@ -218,11 +222,8 @@ void verde(Semaforo *semActual,Listasemaforos *S)
 		else {
 			semActual->bloquear(); //El vehiculo no existe o ya llego a destino
 			if(vehiculo != NULL) colaSem->extraer();
-			else cout<<"VEHICULO NUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"<<endl;
-		}
-			
+		}	
 	}
-	cout<<"SALIO DE VERDE"<<endl;
 }
 
 void recalculando(Grafo *city, Vehiculo *myCar)

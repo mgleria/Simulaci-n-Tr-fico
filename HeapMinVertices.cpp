@@ -3,10 +3,6 @@ heap-MIN de Nodo (vertices) que hace de cola de prioridad para utilizar en el al
 El nodo adyacente con el menor peso será el que se ubica en la cima del heap.
 */
 
-/*
-DATOS RELEVANTES???
-*/
-
 class HeapMinVertices{
     protected:
             Nodo *Vertices[cantNODOS];											
